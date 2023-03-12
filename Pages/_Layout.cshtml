@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace FirstApp.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <base href="~/" />
+  <link href="css/site.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link href="FirstApp.styles.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round"
+    rel="stylesheet">
+  <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+  @* <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" /> *@
+  <link rel="stylesheet" href="_content/BlazorDateRangePicker/daterangepicker.min.css" />
+</head>
+
+<body>
+  @RenderBody()
+
+  <div id="blazor-error-ui">
+    <div class="modal is-active">
+      <div class="modal-background"></div>
+      <div class="modal-content">
+        <div class="field has-addons">
+          <div class="control">
+            <span class="button is-white is-loading">
+              <span class="icon">
+                <i class="material-icons-outlined is-size-5">refresh</i>
+              </span>
+            </span>
+          </div>
+          <div class="control is-expanded">
+            <div class="button is-white is-fullwidth pl-1">
+              Đang kết nối lại...
+            </div>
+          </div>
+          <div class="control">
+            <a class="button is-link is-light" title="Tải lại trang" onclick="document.location.reload()">
+              Thử lại
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @* <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <script src="~/lib/signalr/dist/browser/signalr.js"></script> *@
+  <script src="_framework/blazor.server.js"></script>
+  <script src="_content/BlazorDateRangePicker/clickAndPositionHandler.js"></script>
+
+</body>
+
+</html>

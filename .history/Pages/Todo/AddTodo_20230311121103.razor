@@ -1,0 +1,176 @@
+@inject IJSRuntime JSRuntime
+ <tr>
+     <td class="is-vcentered has-text-info-dark has-text-weight-bold border-bottom-none">
+         <input class="input is-normal font-size-14" type="text" @bind=@name placeholder="Nhập tên công việc">
+     </td>
+     <td class="is-vcentered category-work border-bottom-none">
+         <div>
+             <div class="select is-fullwidth">
+                 <select @bind=@type class="font-size-14">
+                     @foreach (var type in TypeTodoHelper.AddTypeToList())
+                     {
+                     <option value=@type.id>@type.name</option>
+                     }
+                 </select>
+             </div>
+         </div>
+     </td>
+     <td class="is-vcentered priority-work border-bottom-none">
+         <div>
+             <div class="select is-fullwidth">
+                 <select @bind=@priority class="font-size-14">
+                     @foreach (var priority in PriorityHelper.AddPriorityToList())
+                     {
+                     <option value=@priority.id>@priority.name</option>
+                     }
+                 </select>
+             </div>
+         </div>
+     </td>
+     <td class="is-vcentered has-text-centered start-time border-bottom-none">
+         <div>
+             <div class="select is-fullwidth">
+                 <select @bind=@startTime class="font-size-14">
+                     @foreach (var item in RenderTimeHelper.RenderTime("7:00", "23:50",
+                     10))
+                     {
+                     <option value=@item>@item</option>
+                     }
+                 </select>
+             </div>
+         </div>
+     </td>
+     <td class="is-vcentered has-text-centered start-time border-bottom-none">
+         <div>
+             <div class="select is-fullwidth">
+                 <select @bind=@endTime class="font-size-14">
+                     @foreach (var item in RenderTimeHelper.RenderTime("7:00", "23:50",
+                     10))
+                     {
+                     <option value=@item>@item</option>
+                     }
+                 </select>
+             </div>
+         </div>
+     </td>
+     <td class="pr-0 border-bottom-none">
+         <div class="dropdown is-hoverable click is-justify-content-center is-fullwidth">
+             <div class="dropdown-trigger">
+                 <a class="button is-rounded @currentStatus.color px-2 is-small" style="width: 90px;">
+                     <span>@currentStatus.name</span>
+                     <span class="icon is-small">
+                         <span class="material-icons material-symbols-outlined">arrow_drop_down</span>
+                     </span>
+                 </a>
+             </div>
+             <div class="dropdown-menu">
+                 <div class="dropdown-content">
+                     @foreach (var status in StatusHelper.AddStatusToList())
+                     {
+                     <div @onclick="() => HandleChangeStatus(status.id)" class="dropdown-item has-text-left">
+                         @status.name</div>
+                     }
+
+                 </div>
+             </div>
+         </div>
+     </td>
+ </tr>
+ <tr>
+     <td colspan="3" class="pb-0 pt-0">
+         <div class="columns is-vcentered mb-0 is-12 m-0">
+             <span class="td-label is-show column is-1 p-0">Chi tiết:</span>
+             <div class="column is-11 pl-0 py-0">
+                 <textarea class="textarea p-1" @bind=@description placeholder="Nhập chi tiết công việc"
+                     rows="1"></textarea>
+             </div>
+         </div>
+         <div class="columns is-vcentered pt-0 is-10 m-0">
+             <span class="td-label is-show column is-1 p-0">Kết quả: </span>
+             <div class="column is-11 pl-0">
+                 <textarea class="textarea p-1" @bind=@result placeholder="Nhập chi tiết công việc" rows="1"></textarea>
+             </div>
+         </div>
+
+     </td>
+     <td colspan="3" class="pb-0">
+         <div class="control is-flex is-justify-content-flex-end">
+             <div @onclick="HandleAddTodoChild" class="blue-text mr-3">
+                 <span class="icon-text has-text-info-dark font-size-14 is-have-pointer">
+                     <span class="icon">
+                         <span class="icon material-icons material-symbols-outlined">edit</span>
+                     </span>
+                     <span>Cập nhật</span>
+                 </span>
+             </div>
+             <div @onclick="HandleRemoveTodo" class="red-text">
+                 <span class="icon-text has-text-danger font-size-14 is-have-pointer">
+                     <span class="icon">
+                         <span class="icon material-icons material-symbols-outlined">delete</span>
+                     </span>
+                     <span>Xoá</span>
+                 </span>
+             </div>
+         </div>
+     </td>
+ </tr>
+
+@code {
+    public TodoTextModel currentStatus = new TodoTextModel {
+        id = 1, 
+        name = "Todo", 
+        color = "",
+    };
+    public bool isErr { get; set; }
+    private string? name;
+    private string? description;
+    private string? result;
+    private int type = 1;
+    private int priority = 1;
+    private string? startTime = RenderTimeHelper.FormatTime(false);
+    private string? endTime  = RenderTimeHelper.FormatTime(true);
+    [Parameter]
+    public EventCallback<TodoModel> HandleAddTodo { get; set; }
+    private void HandleChangeStatus(int id)
+    {
+        currentStatus = StatusHelper.FindStatusById(id);
+    }
+    private async Task HandleAddTodoChild()
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            isErr = true;
+            return;     
+        }
+        var todo = new TodoModel
+            {
+                _id = GenerateIDHelper.GenerateID("2345"),
+                userId = "2345",
+                name = name,
+                description = description,
+                result = result,
+                date = DateTime.Now.ToString("d/M/yyyy"),
+                startTime = startTime,
+                endTime = endTime,
+                type = type,
+                priority = priority,
+                status = currentStatus.id,
+            };
+        await HandleAddTodo.InvokeAsync(todo);
+        @* name = String.Empty;
+        result = String.Empty;
+        description = String.Empty; 
+        startTime = String.Empty;
+        endTime = String.Empty;
+        type = 1;
+        priority = 1;
+        status = 1; *@
+    }
+
+    private async Task HandleRemoveTodo() {
+        bool isConfirmed =  await JSRuntime.InvokeAsync<bool>("confirm", "Bạn có muốn xóa" + name  + "?");
+        if(isConfirmed) {
+            return;
+        }
+    }
+}

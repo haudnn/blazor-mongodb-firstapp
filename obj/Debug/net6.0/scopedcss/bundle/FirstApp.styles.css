@@ -1,0 +1,25 @@
+/* _content/FirstApp/Pages/TicTacToe/TicTacToe.razor.rz.scp.css */
+.container[b-j7wk61rwq4] {
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 33% 33% 33%;
+  grid-template-rows: 33% 33% 33%;
+  max-width: 300px;
+}
+.tile[b-j7wk61rwq4] {
+  border: 1px solid #333;
+  min-width: 100px;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 50px;
+  cursor: pointer;
+}
+.playerX[b-j7wk61rwq4] {
+  color: #09c372;
+}
+
+.playerO[b-j7wk61rwq4] {
+  color: #498afb;
+}

@@ -1,0 +1,69 @@
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<section id="header" class="header_main">
+  <ul class="columns is-mobile is-vcentered is-variable is-1">
+    <li class="column">
+      @* <div class="icon-text">
+        <span class="icon image is-24x24 is-rounded">
+          <img src="@Layout.User.avatar">
+        </span>
+        <span class="has-text-black has-text-weight-medium ml-3 font_14 is-hidden-mobile">
+          @Layout.User.FullName
+        </span>
+      </div> *@
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "mail" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+        </div>
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "blogs" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+        </div>
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "okrs" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+        </div>
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "plan" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+        </div>
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "educate" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+        </div>
+      </div>
+    </li>
+    <li class="column is-narrow">
+      <div class="is-noti dropdown is-right @(toggleActive == "other" ? "is-active" : "")">
+        <div class="dropdown-trigger">
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+@code {
+  [CascadingParameter]
+  public LayoutMain Layout { get; set; }
+  private string toggleActive = string.Empty;
+  private int count_mail = 0;
+  private int count_blogs = 0;
+  private int count_okrs = 0;
+  private int count_plan = 0;
+  private int count_educate = 0;
+  private int count_other = 0;
+  protected override async Task OnParametersSetAsync()
+  {
+    toggleActive = string.Empty;
+  }
+}

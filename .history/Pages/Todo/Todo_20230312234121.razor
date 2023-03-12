@@ -1,0 +1,347 @@
+@page "/todo"
+@inject IJSRuntime JSRuntime
+@using FirstApp.Data
+@using FirstApp.Models
+@using FirstApp.Helpers
+@using BlazorDateRangePicker
+<PageTitle>Todolist</PageTitle>
+<main class="columns is-gapless mb-2">
+    <section id="content" class="column">
+        <section class="columns is-gapless py-1">
+            <div class="column mx-4" style="width: calc(100% - 210px);">
+                <div class="content-right">
+                    <div class="py-4 has-text-grey has-text-centered">
+                        <p class="is-italic">"Sống phải có đam mê, tôi chưa thấy ai thành công mà không có đam mê của
+                            riêng mình."
+                            — Donald Trump</p>
+                    </div>
+
+                    <div style="border: 1px solid #dbdbdb;  border-radius: 10px; background-color: #fff;  box-shadow: 0px 0px 0px 1px #e2e2e2"  
+                        class="main-content p-5">
+                        <div class="columns is-gapless">
+                            <div class="column">
+                                <p style="color:#585c7d" class="mb-0 is-size-5 has-text-weight-bold">TODOLIST CỦA TÔI
+                                </p>
+                                <p class="is-size-7 has-text-info is-italic text-main-color">Lựa chọn ngày phù hợp và
+                                    tạo list công việc
+                                </p>
+                            </div>
+                            <div class="column is-narrow">
+                                <div class="field has-addons">
+                                    <div class="control has-icons-left ">
+                                        <span class="icon is-left has-text-link"><i class="material-icons-round font-size-14">event</i></span>
+                                        <div class="input is-link is-family-code ">
+                                            @* <span class="font-size-14">T7 - 11/03/2023</span> *@
+                                            @* <DateRangePicker 
+                                                class="form-control form-control-sm font-size-14" 
+                                                @bind-StartDate="currentDate"
+                                                SingleDatePicker="true"
+                                                OnRangeSelect="OnRangeSelect"
+                                            />       *@
+                                        </div>
+                                    </div>
+                                    <div class="control">
+                                        <a class="button is-link is-outlined">
+                                            <span class="icon">
+                                                <i class="material-icons-outlined font-size-14">chevron_left</i>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="control">
+                                        <a class="button is-link is-outlined">
+                                            <span class="icon">
+                                                <i class="material-icons-outlined font-size-14">
+                                                    chevron_right
+                                                </i>
+                                            </span>                                                
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <table class="table table-todolist">
+                            <thead>
+                                <tr>
+                                    <th class="has-text-weight-normal has-text-grey font-size-14">Danh sách công việc</th>
+                                    <th width="140px" class=" has-text-weight-normal has-text-grey font-size-14">Phân loại</th>
+                                    <th width="140px" class="has-text-weight-normal has-text-grey font-size-14">Độ ưu tiên</th>
+                                    <th width="105px" class="has-text-weight-normal has-text-grey has-text-centered font-size-14">Bắt
+                                        đầu</th>
+                                    <th width="105px" class="has-text-weight-normal has-text-grey has-text-centered font-size-14">Kết
+                                        thúc</th>
+                                    <th width="105px"
+                                        class="has-text-weight-normal has-text-grey has-text-centered pr-0 font-size-14">Tình trạng
+                                    </th>
+                                </tr>
+                            </thead>
+                             @if (ListTodosByCurrentDate?.Count > 0)
+                                {
+                                    @foreach (var todo in ListTodosByCurrentDate)                                      
+                                    {
+                                        <TodoItem
+                                            id="@todo._id"                                   
+                                            name="@todo.name" 
+                                            startTime="@todo.startTime"
+                                            endTime="@todo.endTime"
+                                            description="@todo.description"
+                                            result="@todo.result"
+                                            priorityTodo="PriorityHelper.FindPriorityById(todo.priority)"
+                                            status="StatusHelper.FindStatusById(todo.status)"
+                                            typeTodo="TypeTodoHelper.FindTypeById(todo.priority)"
+                                            HandleRemoveTodo="HandleRemoveTodo"
+                                            HandleChangeStatusTodo="HandleChangeStatusTodo"
+                                            HandleUpdateTodo="HandleUpdateTodo"
+                                        />
+                                    }
+                                }
+                             @if(countTimesGenerated > 0) 
+                                { 
+                                @for (int i = 0; i < countTimesGenerated; i++) {
+                                        <AddTodo HandleAddTodo="HandleAddTodo" />
+                                    }
+                                }     
+                        </table>
+
+                        <div class="last-detail-todolist field is-grouped is-grouped-multiline">
+                            <div class="control is-expanded has-text-weight-semibold has-text-link font-size-14">
+                                Tôi biết bạn sẽ làm tốt mà. Hãy hoàn thành thật sớm nhé!
+                            </div>
+                            <div class="control" @onclick="HandleAddTodoComponent">
+                                <div id="check-out" style="background-color: #585c7d;" class="button is-info font-size-14 btn-padding">
+                                    <span class="material-icons-outlined is-size-6">
+                                        add
+                                    </span>
+                                    <span class="click">Thêm công việc</span>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <div id="check-out" class="button is-info font-size-14 btn-padding">
+                                    <span class="material-icons-outlined is-size-6">
+                                        logout
+                                    </span>
+                                    <span class="click">Check-in</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="table-history-todolist p-5 mt-4 "
+                        style="border: 1px solid #dbdbdb;  border-radius: 10px; background-color: #fff;  box-shadow: 0px 0px 0px 1px #e2e2e2">
+                        <ul class="title-history m-0 columns is-vcentered is-variable is-2 is-align-items-center">
+                            <li class="column name-title">
+                                <p style="color:#585c7d" class="is-size-5 has-text-weight-bold">DANH SÁCH TODOLIST</p>
+                            </li>
+                            <li style="width: 100%" class="column is-flex justify-content-end is-align-items-flex-end">
+                            @* <div class="dropdown is-hoverable is-right click">
+                                    <div class="dropdown-trigger is-flex is-align-items-center">
+                                        <span class="text text-main-color">Tuần này</span>
+                                        <span class="icon material-icons material-symbols-outlined">
+                                            arrow_drop_down
+                                        </span>
+                                    </div>
+                                    <div class="dropdown-menu">
+                                        <div class="dropdown-content">
+                                            <p class="dropdown-item">Tuần này</p>
+                                            <p class="dropdown-item">Tuần trước</p>
+                                            <p class="dropdown-item">Tháng này</p>
+                                            <p class="dropdown-item">Tháng trước</p>
+                                            <p class="dropdown-item">Quý này</p>
+                                        </div>
+                                    </div>
+                            </div> *@
+                            </li>
+                            <li class="column is-narrow">
+                                <div class="dropdown is-right">
+                                    <div class="dropdown-trigger">
+                                        <a class="icon-text">
+                                            <span class="has-text-link">Todolist của tôi</span>
+                                            <span class="icon">
+                                                <i class="material-icons-outlined is-size-5">arrow_drop_down</i>
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="column is-one-quarter">
+                                <div class="control has-icons-left has-icons-right has_suggest"><input
+                                        class="input is-rounded" type="text" placeholder="Nhập tên nhân viên..."
+                                        autocomplete="off">
+                                    <ul class="suggest"></ul>
+                                    <span class="icon is-left">
+                                        <i class="material-icons-outlined">search</i>
+                                    </span>
+                                    <a class="is-hidden">
+                                        <i class="material-icons-outlined">close</i>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <table class="table is-noborder is-fullwidth is-vcentered is-responsive mt-3">
+                            <thead>
+                                <tr class="has-text-weight-semibold">
+                                    <th style="color: #7a7a7a">Thành viên</th>
+                                    <th style="color: #7a7a7a" width="190px">Ngày check-in</th>
+                                    <th style="color: #7a7a7a" width="190px">Ngày check-out</th>
+                                    <th style="color: #7a7a7a" width="120px">Hoàn thành</th>
+                                    <th style="color: #7a7a7a" width="120px">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="info-user">
+                                    <td class="td-noborder" colspan="5">
+                                        <div class="user-item">
+                                            <img class="image is-36x36 mr-2 is-rounded"
+                                                src="https://avatars.dicebear.com/api/adventurer-neutral/231441AAFA.svg">
+
+                                            <div>
+                                                <p class="has-text-weight-semibold is-size-6 text-main-color m-0">Lương
+                                                    Thanh Thắng</p>
+                                                <p class="text_1_line has-text-grey is-size-7" style="width: 400px;">
+                                                    DOCORP / CONANDO / Team Dev</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-noborder pl-6">
+                                        <div class="day">
+                                            <span class="icon-text has-text-info-dark has-text-weight-bold"
+                                                style="align-items: baseline;">
+                                                <span
+                                                    class="has-text-weight-semibold text-main-color font-size-14">31/01/2023</span>
+                                                <span
+                                                    class="load-more click icon material-icons material-symbols-outlined is-size-7">play_arrow</span>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="td-noborder">
+                                        <div class="td-value">
+                                            <span class="font-size-14">30/01 - 17:37</span>
+                                            <span class="has-text-success font-size-14">Đúng hạn</span>
+                                        </div>
+
+                                    </td>
+
+                                    <td class="td-noborder">
+                                        <span class="font-size-14">Chưa Check-out</span>
+                                        @* <span>30/01 - 17:37</span>
+                                        <span class="ml-2 status-done">Đúng hạn</span> *@
+                                    </td>
+
+                                    <td class="td-noborder has-text-weight-semibold font-size-14">
+                                        0/1 - 0%
+                                    </td>
+                                    <td class="td-noborder  has-text-weight-semibold font-size-14">
+                                        Đã xác nhận
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-noborder pl-6">
+                                        <div class="ml-3 text_1_line font-size-14">
+                                            • Chào cờ đầu tuần, họp giao ban, họp báo cáo tháng 2 và plan tháng 3
+                                        </div>
+                                    </td>
+                                    <td class="td-noborder font-size-14">
+                                        <label class="has-text-grey" for="">Ưu tiên:</label>
+                                        <span class="has-text-success">Bình thường</span>
+                                    </td>
+                                    <td class="td-noborder font-size-14">
+                                        <span>
+                                            08:30 - 09:30
+                                        </span>
+                                    </td>
+                                    <td class="td-noborder">08:30 - 09:00</td>
+                                    <td class="td-noborder">Todo</td>
+                                </tr>
+                                <tr>
+                                    <td class="td-noborder pl-6">
+                                        <div class="ml-3 text_1_line font-size-14">
+                                            • Chào cờ đầu tuần, họp giao ban, họp báo cáo tháng 2 và plan tháng 3
+                                        </div>
+                                    </td>
+                                    <td class="td-noborder font-size-14">
+                                        <label class="has-text-grey" for="">Ưu tiên:</label>
+                                        <span class="has-text-success">Bình thường</span>
+                                    </td>
+                                    <td class="td-noborder font-size-14">
+                                        <span>
+                                            08:30 - 09:30
+                                        </span>
+                                    </td>
+                                    <td class="td-noborder">08:30 - 09:00</td>
+                                    <td class="td-noborder">Todo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </section>
+</main>
+
+@code {
+    public List<TodoModel> ListTodosByCurrentDate { get; set; } = new List<TodoModel>();
+    public DateTimeOffset currentDate { get; set; } = DateTime.Today;
+    private int countTimesGenerated = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        await getAllTodoByDay(currentDate);
+    }
+    private void HandleAddTodoComponent() {
+        countTimesGenerated++;
+    }
+
+
+    public void OnRangeSelect(DateRange range)
+    {
+        var date = range.Start.Date;
+        @* currentDate = range.Start; *@
+        Console.WriteLine(date);
+    }
+    private async Task HandleAddTodo(TodoModel todo)
+    {
+        TodoData todoData = new TodoData();
+        await todoData.CreateTodo(todo);
+        await JSRuntime.InvokeAsync<object>("alert", "Create todo successfully!");
+        await getAllTodoByDay(currentDate);
+        countTimesGenerated-- ;
+        StateHasChanged();
+    }
+
+    private async Task getAllTodoByDay(DateTimeOffset date) {
+        TodoData todoData = new TodoData();
+        var formatDate = date.ToString().Split(' ')[0];
+        ListTodosByCurrentDate = await todoData.FindTodosByDate(formatDate);
+        return;
+    }
+
+    private async Task HandleUpdateTodo(TodoModel todo){
+        TodoData todoData = new TodoData();
+        await todoData.UpdateTodo(todo);
+        await JSRuntime.InvokeAsync<object>("alert", "Update todo successfully!");
+        await getAllTodoByDay(currentDate);
+        StateHasChanged();
+    }
+
+
+    private async Task HandleRemoveTodo( string id ) {
+        TodoData todoData = new TodoData();
+        await todoData.DeleteTodo(id);
+        await JSRuntime.InvokeAsync<object>("alert", "Create todo successfully!");
+        await getAllTodoByDay(currentDate);
+        StateHasChanged();
+    }
+
+    private async Task HandleChangeStatusTodo (TodoModel todo) {
+        TodoData todoData = new TodoData();
+        await todoData.UpdateStatusTodo(todo._id, todo.status);
+        await getAllTodoByDay(currentDate);
+        StateHasChanged();
+    }
+}

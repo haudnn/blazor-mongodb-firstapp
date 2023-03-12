@@ -1,0 +1,12 @@
+<div id="notify">
+  <div class="notification is-danger">
+    @* <a class="delete" onclick="taglineHide()"></a> *@
+    <p>@message</p>
+  </div>
+</div>;
+@code {
+    
+    [Parameter]
+    public string message { get; set; }
+    
+}

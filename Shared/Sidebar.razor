@@ -1,0 +1,272 @@
+
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+@* @inject ProtectedLocalStorage ProtectedLocalStore *@
+
+<section class="@(isSmall ? " sidebar-small" : "" )" id="sidebar">
+  <div class="columns is-vcentered is-gapless px-2 mb-0 logo-details is-justify-content-center">
+    <a class="column is-narrow icon-menu">
+      <span class="material-icons-outlined has-text-white p-2 click">menu</span>
+    </a>
+    <div class="column has-text-right has-text-white quarter-calendar">
+      <div class="dropdown is-hoverable is-left click">
+        <a class="dropdown-trigger">
+          <span class="icon-text has-text-white">
+            <span class="has-text-weight-medium">Quý I - 2023</span>
+            <span class="icon">
+              <span class="material-icons-outlined is-size-7"> arrow_drop_down</span>
+            </span>
+          </span>
+        </a>
+        <div class="dropdown-menu">
+          <div class="dropdown-content has-font-13 has-text-left">
+            <a class="dropdown-item px-4 py-1">Quý I - 2023</a>
+            <a class="dropdown-item px-4 py-1">Quý IV - 2022</a>
+            <a class="dropdown-item px-4 py-1">Quý III - 2022</a>
+            <a class="dropdown-item px-4 py-1">Quý II - 2022</a>
+            <a class="dropdown-item px-4 py-1">Quý I - 2022</a>
+            <a class="dropdown-item px-4 py-1">Quý IV - 2021</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="scroll-y">
+    <ul class="px-2 mt-4">
+      @* @foreach (SidebarModell navItem in sidebarList)
+      {
+        <li class="main-item click mb-2 @(navItem.isActive ? "is-active" : "" )">
+        @if(navItem.subMenu != null)
+        {
+          <a @onclick="() => navItem.isActive = !navItem.isActive"
+            class="px-1 py-1 icon-text has-text-white is-align-items-center">
+            <div class="is-flex is-align-items-center">
+              <span class="icon">
+                <span class="material-icons-outlined is-size-6">@navItem.icon</span>
+              </span>
+              <span class="has-text-weight-medium link-name">@navItem.name</span>
+            </div>
+            <span class="material-icons-outlined is-size-6 icon-arrow icon-parent ml-2">@(!navItem.isActive ? "arrow_right" : "arrow_drop_down")</span>
+          </a>
+
+          <ul class="my-1 sub-menu">
+            @foreach (SidebarModell navSubItem in navItem.subMenu)
+            {
+              <li class="click my-1 pl-2 @(navSubItem.isActive ? " is-active" : "" )">
+              @if(navSubItem.subMenu != null)
+              {
+                <a @onclick="() => navSubItem.isActive = !navSubItem.isActive"
+                  class="px-1 py-1 icon-text has-text-white is-align-items-center">
+                  <div class="is-flex is-align-items-center">
+                    <span class="icon">
+                      <span class="material-icons-outlined is-size-6">@navSubItem.icon</span>
+                    </span>
+                    <span class="has-text-weight-medium">@navSubItem.name</span>
+                  </div>
+                  <span class="material-icons-outlined is-size-6 icon-arrow ml-2">@(!navSubItem.isActive ? "arrow_right" : "arrow_drop_down")</span>
+                </a>
+                <ul class="my-1 sub-sub-menu">
+                  @foreach (var navSubSubItem in navSubItem.subMenu)
+                  {
+                  <li class="click @(navSubSubItem.isActive ? " is-active" : "" )"
+                    @onclick="() => navSubSubItem.isActive = !navSubSubItem.isActive">
+                    <a href="@navSubSubItem.url"
+                      class="px-1 py-1 icon-text has-text-white is-align-items-center">
+                      <div class="is-flex is-align-items-center">
+                        <span class="icon">
+                          <span class="material-icons-outlined is-size-6">@navSubSubItem.icon</span>
+                        </span>
+                        <span class="has-text-weight-medium">@navSubSubItem.name</span>
+                      </div>
+                    </a>
+                  </li>
+                  }
+                </ul>
+              } 
+              else
+              {
+                <a href="@navSubItem.url"
+                  class="px-1 py-1 icon-text has-text-white is-align-items-center">
+                  <div class="is-flex is-align-items-center">
+                    <span class="icon">
+                      <span class="material-icons-outlined is-size-6">@navSubItem.icon</span>
+                    </span>
+                    <span class="has-text-weight-medium">@navSubItem.name</span>
+                  </div>
+                </a>
+              } 
+              </li>
+            }
+          </ul>
+        }
+        else
+        {
+          <a href="@navItem.url"
+            class="px-1 py-1 icon-text has-text-white is-align-items-center">
+            <div class="is-flex is-align-items-center">
+              <span class="icon">
+                <span class="material-icons-outlined is-size-6">@navItem.icon</span>
+              </span>
+              <span class="has-text-weight-medium link-name">@navItem.name</span>
+            </div>
+          </a>
+        }
+        </li>
+      } *@
+    </ul>
+    <div class="click sign-out">
+      <a class="px-1 py-1 icon-text has-text-white is-align-items-center is-justify-content-space-between">
+        <div class="is-flex is-align-items-center">
+          <span class="icon">
+            <span class="material-icons-outlined is-size-6">logout</span>
+          </span>
+          <span class="has-text-weight-medium link-name">Đăng xuất</span>
+        </div>
+      </a>
+    </div>
+  </nav>
+</section>
+
+@code{
+    @* private List<SidebarModel> sidebarList = new(); *@
+    private bool isSmall = false;
+    [CascadingParameter]
+    public LayoutMain? mainLayout {get; set;}
+    protected override void OnInitialized()
+    {
+      @* getSidebarList(); *@
+    }
+
+    protected override void OnParametersSet()
+    {
+      var url = navigation.Uri.Replace(navigation.BaseUri, ""); //chỉ lấy phần vd: /okr
+      @* foreach (var item in sidebarList) 
+      {
+        item.isActive = url.StartsWith(item.url.Replace("#", ""));
+        if(item.subMenu != null) 
+        {
+          foreach(var subItem in item.subMenu) 
+          {
+            subItem.isActive = url.StartsWith(subItem.url.Replace("#", ""));
+            if(subItem.subMenu != null) 
+            {
+              foreach(var subSubItem in subItem.subMenu) 
+              {
+                subSubItem.isActive = url.StartsWith(subSubItem.url.Replace("#", ""));
+              }
+            }
+          }
+        }
+      } *@
+    }
+    @* protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await ProtectedLocalStore.GetAsync<bool>("sidebar");
+            isSmall = result.Success ? result.Value : false;
+            StateHasChanged();
+        }
+    } *@
+
+    @* private async Task ToggleSidebar()
+    {
+        isSmall = !isSmall;
+        await ProtectedLocalStore.SetAsync("sidebar", isSmall);
+    } *@
+
+  @* private void getSidebarList() {
+    sidebarList = new List<SidebarModell> {
+      new SidebarModell {
+        name = "Tin tức",
+        url = "blogs",
+        icon = "dashboard"
+      },
+      new SidebarModell {
+        name = "Thống kê",
+        url = "reports",
+        icon = "bar_chart"
+      },
+      new SidebarModell {
+        name = "Đội nhóm",
+        url = "teams",
+        icon = "group"
+      },
+      new SidebarModell {
+        name = "Todolist",
+        url = "todolist",
+        icon = "check_box"
+      },
+      new SidebarModell {
+        name = "Kế hoạch",
+        url = "work",
+        icon = "view_timeline"
+      },
+      new SidebarModell {
+        name = "OKRs",
+        url = "#okr",
+        icon = "track_changes",
+        subMenu = new List<SidebarModell>
+        {
+          new SidebarModell { 
+            name = "Thiết lập", url = "#okr/setup",
+            subMenu = new List<SidebarModell>
+            {
+              new SidebarModell { name = "Timeline", url = "okr/setup/timeline" },
+              new SidebarModell { name = "Góp ý mục tiêu", url = "okr/setup/suggest" },
+              new SidebarModell { name = "Công bố mục tiêu", url = "okr/setup/target" },
+              new SidebarModell { name = "Tạo OKRs", url = "okr/setup/detail" },
+            }
+          },
+          new SidebarModell { name = "Hành động", url = "okr/tasks" },
+          new SidebarModell { name = "Tổng quan", url = "okr/overview" },
+        }
+      },
+      new SidebarModell {
+        name = "CFRs",
+        url = "#cfr",
+        icon = "grade",
+        subMenu = new List<SidebarModell>
+        {
+          new SidebarModell { name = "Check-in", url = "cfr/checkin" },
+          new SidebarModell { name = "Ghi nhận - Tặng sao", url = "cfr/star" }
+        }
+      },
+      new SidebarModell {
+        name = "Kaizen",
+        url = "kaizen",
+        icon = "show_chart"
+      },
+      new SidebarModell {
+        name = "Đổi quà",
+        url = "#gift",
+        icon = "card_giftcard",
+        subMenu = new List<SidebarModell>
+        {
+          new SidebarModell { name = "Cửa hàng", url = "gift/product" },
+          new SidebarModell { name = "Lịch sử đổi quà", url = "gift/exchange" }
+        }
+      },
+      new SidebarModell {
+        name = "Đào tạo",
+        url = "#educate",
+        icon = "book",
+        subMenu = new List<SidebarModell>
+        {
+          new SidebarModell { name = "Khóa học", url = "educate/course/list" },
+          new SidebarModell { name = "Quản lý khóa học", url = "educate/course/manager" },
+          new SidebarModell { name = "Chấm bài thi", url = "educate/exam/manager" },
+          new SidebarModell { name = "Cấp chứng chỉ", url = "educate/certificate/manager" },
+          new SidebarModell { name = "Chứng chỉ đạt được", url = "educate/certificate/list" },
+        }
+      },
+      new SidebarModell {
+        name = "Tài khoản",
+        url = "user/info",
+        icon = "account_circle"
+      }
+    };
+  } *@
+}

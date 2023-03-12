@@ -1,0 +1,182 @@
+@inject IJSRuntime JSRuntime
+
+@if(!isUpdateTodo) {
+    <tr class="view-title">
+        <td class="is-vcentered has-text-weight-semibold has-text-link no-border text-main-color">
+            @name</td>
+        <td class="is-vcentered category-work has-text-weight-semibold no-border font-size-14">@typeTodo.name
+        </td>
+        <td class="is-vcentered priority-work has-text-weight-semibold @priorityTodo.color no-border font-size-14">
+            @priorityTodo.name</td>
+        <td class="is-vcentered has-text-centered start-time is-size-6 no-border font-size-14">@startTime</td>
+        <td class="is-vcentered has-text-centered end-time no-border font-size-14">@endTime</td>
+        <td class="has-text-centered no-border">
+            <div class="dropdown is-hoverable click is-justify-content-center">
+                <div class="dropdown-trigger">
+                    <a class="button is-rounded @status.color px-2 is-small" style="width: 90px;">
+                        <span>@status.name</span>
+                        <span class="icon is-small">
+                            <span class="material-icons material-symbols-outlined">arrow_drop_down</span>
+                        </span>
+                    </a>
+                </div>
+                <div class="dropdown-menu" style="border: none">
+                    <div class="dropdown-content">
+                        @foreach (var status in StatusHelper.AddStatusToList())
+                        {
+                        <div @onclick="(() => HandleChangeStatusTodoChild( status.id ))"
+                            class="dropdown-item has-text-left">
+                            @status.name</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr class="view-detail">
+        <td colspan="3">
+            @if(description != null) {
+            <div class="is-flex">
+                <label class="td-label is-show">Chi tiết:</label>
+                <div class="td-value is-word-break">
+                    <div class="text_2_line">
+                        @description
+                    </div>
+                </div>
+            </div>
+            }
+            @if(result != null) {
+            <div class="is-flex">
+                <label class="td-label is-show">Kết quả:</label>
+                <div class="td-value is-word-break">
+                    <div class="text_2_line">
+                        @result
+                    </div>
+                </div>
+            </div>
+            }
+
+        </td>
+        <td colspan="3" valign="bottom">
+            <div class="control is-flex is-justify-content-flex-end">
+                <div @onclick="HandleCallUpdate" class="blue-text mr-2 is-have-pointer">
+                    <span class="icon-text has-text-link mr-3 font-size-14">
+                        <span class="icon">
+                            <span class="icon material-icons material-symbols-outlined">edit</span>
+                        </span>
+                        <span>Chỉnh sửa</span>
+                    </span>
+                </div>
+                <div @onclick="HandleRemoveTodoChild" class="red-text">
+                    <span class="icon-text has-text-danger font-size-14 is-have-pointer">
+                        <span class="icon">
+                            <span class="icon material-icons material-symbols-outlined">delete</span>
+                        </span>
+                        <span>Xoá</span>
+                    </span>
+                </div>
+            </div>
+        </td>
+    </tr>
+}
+else{ 
+    <EditTodo
+        id="@id"
+        name="@name"
+        result="@result"
+        description="@description"
+        startTime="@startTime"
+        endTime="@endTime"
+        type="@typeTodo.id"
+        status="@status"
+        priority="@priorityTodo.id"
+        HandleRemoveTodoParent="HandleRemoveTodoChild"
+        HandleUpdateTodoParent="HandleUpdateTodoChild"
+    />
+}
+
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    [Parameter]
+    public string name { get; set; }
+    [Parameter]
+    public string result { get; set; }
+    [Parameter]
+    public string description{ get; set; }
+    [Parameter]
+    public string startTime { get; set; }
+    [Parameter]
+    public string endTime { get; set; }
+    [Parameter]
+    public TodoTextModel typeTodo { get; set; }
+
+    [Parameter]
+    public TodoTextModel status { get; set; }
+
+    [Parameter]
+    public TodoTextModel priorityTodo { get; set; }
+
+    [Parameter]
+    public EventCallback<string> HandleRemoveTodo { get; set; }
+    [Parameter]
+    public EventCallback<TodoModel> HandleChangeStatusTodo { get; set; }
+
+    [Parameter]
+    public EventCallback<TodoModel> HandleUpdateTodo { get; set; }   
+    public bool isUpdateTodo = false;
+
+    private async Task HandleRemoveTodoChild() {
+        bool isConfirmed =  await JSRuntime.InvokeAsync<bool>("confirm", "Bạn có muốn xóa" + " " + name  + "?");
+        if(isConfirmed) {
+            await HandleRemoveTodo.InvokeAsync(id);
+            return;
+        }
+    }
+    private async Task HandleUpdateTodoChild(TodoModel todo) {
+        await HandleUpdateTodo.InvokeAsync(todo);
+        isUpdateTodo =false;
+    }
+    private async Task HandleChangeStatusTodoChild ( int statusId ){
+        TodoTextModel newStatus = StatusHelper.FindStatusById(statusId);
+        status = newStatus;
+        var todo = new TodoModel
+            {
+                _id = id,
+                status = statusId,
+            };
+        await HandleChangeStatusTodo.InvokeAsync(todo);
+        return;
+    }
+    private void HandleCallUpdate() {
+        isUpdateTodo = true;
+    }
+}
+
+
+
+
+@* <li class="list">
+        <input class="checkbox" type="checkbox" @bind="Model.IsDone" />
+        <span class="title @(Model.IsDone ? "done" : "")" >@Model.Title</span>
+        <button @onclick="(() => Remove(Model._id))" >Remove</button>
+        <button @onclick="(() => Edit(Model._id))" >Edit</button>   
+    </li>
+@code {
+    [Parameter]
+    public TodoType Model { get; set; }
+    [Parameter]
+    public EventCallback<int> OnRemoveTodo { get; set; }
+    [Parameter]
+    public EventCallback<int> OnEditTodo { get; set; }  
+    private async Task Remove(int _idTodo)
+    {
+        await OnRemoveTodo.InvokeAsync(_idTodo);
+    }
+    private async Task Edit(int _idTodo)
+    {
+        await OnEditTodo.InvokeAsync(_idTodo);
+    }
+} *@
